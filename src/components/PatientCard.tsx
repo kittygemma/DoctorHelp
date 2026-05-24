@@ -51,7 +51,14 @@ export default function PatientCard({ session, onDismiss }: { session: SessionWi
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <div className="font-bold text-sm text-slate-900">{patient.name}</div>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-sm text-slate-900">{patient.name}</span>
+            {patient.gender && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 uppercase">
+                {patient.gender === 'male' ? 'M' : 'F'}
+              </span>
+            )}
+          </div>
           <div className="text-xs text-slate-400">
             {formatTime(session.arrived_at)} ({timeAgo(session.arrived_at)})
           </div>
