@@ -41,9 +41,13 @@ export default function DashboardPage() {
     const supabase = createClient()
 
     async function fetchSessions() {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
       const { data } = await supabase
         .from('sessions')
         .select('*, patients(*)')
+        .gte('arrived_at', today.toISOString())
         .order('arrived_at', { ascending: true })
 
       if (data) {
