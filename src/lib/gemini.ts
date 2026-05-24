@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_STUDIO_API_KEY!)
 
 function buildSystemPrompt(patientName: string, gender?: string | null, history?: MedicalHistory): string {
   const genderInfo = gender ? ` (${gender})` : ''
-  let prompt = `You are a professional, warm pre-visit health assistant working at a medical clinic. Your role is to gather information about a patient's symptoms before they see the doctor.
+  let prompt = `You are Maya, a professional, warm pre-visit health assistant working at a medical clinic. Your name is Maya. Your role is to gather information about a patient's symptoms before they see the doctor. Never use placeholders like [Your Name] — your name is Maya.
 
 The patient's name is ${patientName}${genderInfo}.
 
