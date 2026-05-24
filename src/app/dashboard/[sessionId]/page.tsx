@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Patient, Message, Diagnosis } from '@/lib/types'
+import CompleteButton from '@/components/CompleteButton'
 
 const URGENCY_LABELS: Record<number, { label: string; color: string }> = {
   1: { label: 'Critical', color: 'bg-red-100 text-red-700' },
@@ -82,6 +83,16 @@ export default async function SessionDetailPage({
                   <div><span className="text-slate-500">Allergies:</span> {patient.medical_history.allergies.join(', ')}</div>
                 ) : null}
               </div>
+            </div>
+          )}
+
+          {/* Complete Button */}
+          {session.status === 'waiting' && (
+            <CompleteButton sessionId={sessionId} />
+          )}
+          {session.status === 'completed' && (
+            <div className="bg-emerald-50 text-emerald-700 text-center py-3 rounded-xl font-bold text-sm">
+              Visit Completed
             </div>
           )}
 

@@ -76,15 +76,14 @@ export default function DashboardPage() {
     }
   }, [])
 
-  const activeSessions = sortSessions(sessions.filter((s) => s.status === 'active'))
+  const inProgressSessions = sessions.filter((s) => s.status === 'active')
+  const waitingSessions = sortSessions(sessions.filter((s) => s.status === 'waiting'))
   const completedSessions = sessions.filter((s) => s.status === 'completed')
 
-  const waitingCount = activeSessions.length
-  const completedCount = completedSessions.length
-  const totalMinutes = activeSessions.reduce((sum, s) => {
+  const totalMinutes = waitingSessions.reduce((sum, s) => {
     return sum + (Date.now() - new Date(s.arrived_at).getTime()) / 60000
   }, 0)
-  const avgWait = waitingCount > 0 ? Math.round(totalMinutes / waitingCount) : 0
+  const avgWait = waitingSessions.length > 0 ? Math.round(totalMinutes / waitingSessions.length) : 0
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -108,16 +107,16 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white rounded-xl p-4 shadow-sm">
-          <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Waiting</div>
-          <div className="text-3xl font-extrabold text-slate-900 mt-1">{waitingCount}</div>
+          <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">In Progress</div>
+          <div className="text-3xl font-extrabold text-amber-500 mt-1">{inProgressSessions.length}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm">
-          <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">In Progress</div>
-          <div className="text-3xl font-extrabold text-amber-500 mt-1">{activeSessions.filter((s) => s.summary).length}</div>
+          <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Waiting</div>
+          <div className="text-3xl font-extrabold text-slate-900 mt-1">{waitingSessions.length}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Completed</div>
-          <div className="text-3xl font-extrabold text-emerald-500 mt-1">{completedCount}</div>
+          <div className="text-3xl font-extrabold text-emerald-500 mt-1">{completedSessions.length}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">Avg Wait</div>
@@ -127,34 +126,51 @@ export default function DashboardPage() {
 
       {/* Patient list */}
       <div className="px-6 pb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-bold text-sm text-slate-900">Waiting Patients</h2>
-          <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            Live — sorted by urgency + arrival
-          </div>
-        </div>
-
         {loading ? (
           <div className="text-center py-12 text-slate-400">Loading...</div>
-        ) : activeSessions.length === 0 ? (
-          <div className="text-center py-12 text-slate-400">No patients waiting</div>
         ) : (
-          <div className="space-y-2">
-            {activeSessions.map((session) => (
-              <PatientCard key={session.id} session={session} />
-            ))}
-          </div>
-        )}
-
-        {completedSessions.length > 0 && (
           <>
-            <h2 className="font-bold text-sm text-slate-900 mt-8 mb-3">Completed</h2>
-            <div className="space-y-2">
-              {completedSessions.map((session) => (
-                <PatientCard key={session.id} session={session} />
-              ))}
+            {/* Waiting for doctor — sorted by urgency */}
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-sm text-slate-900">Waiting for Doctor</h2>
+              <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                Live — sorted by urgency + arrival
+              </div>
             </div>
+            {waitingSessions.length === 0 ? (
+              <div className="text-center py-8 text-slate-400">No patients waiting</div>
+            ) : (
+              <div className="space-y-2">
+                {waitingSessions.map((session) => (
+                  <PatientCard key={session.id} session={session} />
+                ))}
+              </div>
+            )}
+
+            {/* Still chatting with bot */}
+            {inProgressSessions.length > 0 && (
+              <>
+                <h2 className="font-bold text-sm text-slate-900 mt-8 mb-3">Chatting with AI</h2>
+                <div className="space-y-2">
+                  {inProgressSessions.map((session) => (
+                    <PatientCard key={session.id} session={session} />
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Doctor completed */}
+            {completedSessions.length > 0 && (
+              <>
+                <h2 className="font-bold text-sm text-slate-900 mt-8 mb-3">Completed</h2>
+                <div className="space-y-2">
+                  {completedSessions.map((session) => (
+                    <PatientCard key={session.id} session={session} />
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

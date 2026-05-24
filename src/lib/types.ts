@@ -16,7 +16,7 @@ export interface MedicalHistory {
 export interface Session {
   id: string
   patient_id: string
-  status: 'active' | 'completed'
+  status: 'active' | 'waiting' | 'completed'
   urgency: number | null
   summary: string | null
   diagnosis: Diagnosis[]

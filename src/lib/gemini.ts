@@ -85,15 +85,26 @@ export async function chat(
     },
   })
 
-  const chatHistory: Content[] =
+  // Gemini requires history to start with a 'user' message.
+  // The DB history starts with the assistant's opening greeting, so we
+  // prepend the synthetic check-in message that was used to generate it.
+  const fullMessages: Message[] =
     messages.length === 0
       ? []
-      : convertMessages(messages.slice(0, -1))
+      : [
+          { id: '_init', session_id: '', role: 'patient', content: 'Hello, I just checked in.', created_at: '' },
+          ...messages,
+        ]
+
+  const chatHistory: Content[] =
+    fullMessages.length === 0
+      ? []
+      : convertMessages(fullMessages.slice(0, -1))
 
   const lastMessage =
-    messages.length === 0
+    fullMessages.length === 0
       ? 'Hello, I just checked in.'
-      : messages[messages.length - 1].content
+      : fullMessages[fullMessages.length - 1].content
 
   const geminiChat = model.startChat({ history: chatHistory })
   const result = await geminiChat.sendMessage(lastMessage)

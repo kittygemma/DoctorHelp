@@ -12,7 +12,7 @@ create table patients (
 create table sessions (
   id uuid primary key default gen_random_uuid(),
   patient_id uuid references patients(id) not null,
-  status text not null default 'active' check (status in ('active', 'completed')),
+  status text not null default 'active' check (status in ('active', 'waiting', 'completed')),
   urgency integer check (urgency between 1 and 5),
   summary text,
   diagnosis jsonb default '[]',

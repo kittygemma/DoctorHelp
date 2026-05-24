@@ -80,12 +80,14 @@ export default function PatientCard({ session }: { session: SessionWithPatient }
       <Link
         href={`/dashboard/${session.id}`}
         className={`flex-shrink-0 px-3 py-2 rounded-lg text-xs font-bold ${
-          session.status === 'completed'
+          session.status === 'waiting'
             ? 'bg-teal-700 text-white hover:bg-teal-800'
-            : 'bg-slate-100 text-slate-500'
+            : session.status === 'completed'
+            ? 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+            : 'bg-slate-100 text-slate-400'
         }`}
       >
-        {session.status === 'completed' ? 'View Full' : 'Pending'}
+        {session.status === 'active' ? 'Chatting...' : 'View'}
       </Link>
     </div>
   )
