@@ -42,11 +42,14 @@ export async function POST(request: NextRequest) {
     })
 
     if (assessment) {
-      await supabase.from('sessions').update({
+      const updateData: Record<string, unknown> = {
         summary: assessment.summary,
         urgency: assessment.urgency,
-        diagnosis: assessment.possible_diagnoses,
-      }).eq('id', sessionId)
+      }
+      if (assessment.possible_diagnoses?.length > 0) {
+        updateData.diagnosis = assessment.possible_diagnoses
+      }
+      await supabase.from('sessions').update(updateData).eq('id', sessionId)
     }
 
     return NextResponse.json({ reply, assessment, patientName: patient.name })
@@ -85,14 +88,14 @@ export async function POST(request: NextRequest) {
 
   // Update session with latest assessment
   if (assessment) {
-    await supabase
-      .from('sessions')
-      .update({
-        summary: assessment.summary,
-        urgency: assessment.urgency,
-        diagnosis: assessment.possible_diagnoses,
-      })
-      .eq('id', sessionId)
+    const updateData: Record<string, unknown> = {
+      summary: assessment.summary,
+      urgency: assessment.urgency,
+    }
+    if (assessment.possible_diagnoses?.length > 0) {
+      updateData.diagnosis = assessment.possible_diagnoses
+    }
+    await supabase.from('sessions').update(updateData).eq('id', sessionId)
   }
 
   return NextResponse.json({
