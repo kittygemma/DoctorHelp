@@ -35,19 +35,52 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<SessionWithPatient[]>([])
   const [loading, setLoading] = useState(true)
   const [alert, setAlert] = useState<string | null>(null)
+  const [clinicCode, setClinicCode] = useState<string | null>(null)
+  const [doctorName, setDoctorName] = useState('')
   const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
 
     async function fetchSessions() {
+      // Get current user's clinic
+      const { data: { user } } = await supabase.auth.getUser()
+      let clinicId: string | null = null
+
+      if (user) {
+        const { data: doctor } = await supabase
+          .from('doctors')
+          .select('clinic_id, name')
+          .eq('user_id', user.id)
+          .single()
+
+        if (doctor) {
+          clinicId = doctor.clinic_id
+          setDoctorName(doctor.name)
+
+          const { data: clinic } = await supabase
+            .from('clinics')
+            .select('code')
+            .eq('id', clinicId)
+            .single()
+
+          if (clinic) setClinicCode(clinic.code)
+        }
+      }
+
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
-      const { data } = await supabase
+      let query = supabase
         .from('sessions')
         .select('*, patients(*)')
         .gte('arrived_at', today.toISOString())
+
+      if (clinicId) {
+        query = query.eq('clinic_id', clinicId)
+      }
+
+      const { data } = await query
         .order('arrived_at', { ascending: true })
 
       if (data) {
@@ -144,12 +177,32 @@ export default function DashboardPage() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">Doctor</span>
+          <span className="text-xs text-slate-500">{doctorName || 'Doctor'}</span>
           <div className="w-8 h-8 bg-teal-700 rounded-full flex items-center justify-center text-white text-xs font-bold">
-            DR
+            {doctorName ? doctorName[0].toUpperCase() : 'DR'}
           </div>
         </div>
       </div>
+
+      {/* Clinic check-in link */}
+      {clinicCode && (
+        <div className="bg-teal-50 border border-teal-200 mx-6 mt-4 rounded-xl px-4 py-3 flex items-center justify-between">
+          <div>
+            <div className="text-xs font-bold text-teal-700 uppercase tracking-wide">Patient Check-in Link</div>
+            <div className="text-sm text-teal-900 font-mono mt-0.5">
+              {typeof window !== 'undefined' ? window.location.origin : ''}/checkin/{clinicCode}
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/checkin/${clinicCode}`)
+            }}
+            className="bg-teal-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-800"
+          >
+            Copy
+          </button>
+        </div>
+      )}
 
       {/* Urgent Alert Banner */}
       {alert && (

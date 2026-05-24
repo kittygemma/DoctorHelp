@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
-  const { name, dob, gender } = await request.json()
+  const { name, dob, gender, clinicCode } = await request.json()
 
   if (!name || !dob) {
     return NextResponse.json({ error: 'Name and date of birth are required' }, { status: 400 })
@@ -34,10 +34,21 @@ export async function POST(request: NextRequest) {
     patient = newPatient
   }
 
+  // Look up clinic if clinicCode provided
+  let clinicId = null
+  if (clinicCode) {
+    const { data: clinic } = await supabase
+      .from('clinics')
+      .select('id')
+      .eq('code', clinicCode)
+      .single()
+    if (clinic) clinicId = clinic.id
+  }
+
   // Create new session
   const { data: session, error: sessionError } = await supabase
     .from('sessions')
-    .insert({ patient_id: patient.id, status: 'active' })
+    .insert({ patient_id: patient.id, status: 'active', clinic_id: clinicId })
     .select()
     .single()
 

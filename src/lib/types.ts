@@ -14,9 +14,29 @@ export interface MedicalHistory {
   notes?: string
 }
 
+export interface Clinic {
+  id: string
+  name: string
+  code: string
+  stripe_customer_id: string | null
+  stripe_subscription_id: string | null
+  subscription_status: string
+  plan: string
+  created_at: string
+}
+
+export interface Doctor {
+  id: string
+  user_id: string
+  clinic_id: string
+  name: string
+  created_at: string
+}
+
 export interface Session {
   id: string
   patient_id: string
+  clinic_id: string | null
   status: 'active' | 'waiting' | 'completed'
   urgency: number | null
   summary: string | null

@@ -3,6 +3,7 @@ import Link from 'next/link'
 const plans = [
   {
     name: 'Starter',
+    slug: 'starter',
     price: '$49',
     period: '/month',
     description: 'Perfect for solo practitioners',
@@ -13,11 +14,12 @@ const plans = [
       'Real-time dashboard',
       'Email support',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Get Started',
     highlighted: false,
   },
   {
     name: 'Professional',
+    slug: 'professional',
     price: '$149',
     period: '/month',
     description: 'For growing practices',
@@ -30,11 +32,12 @@ const plans = [
       'Priority support',
       'Patient history & analytics',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Get Started',
     highlighted: true,
   },
   {
     name: 'Enterprise',
+    slug: 'enterprise',
     price: 'Custom',
     period: '',
     description: 'For hospitals & clinic networks',
@@ -116,15 +119,16 @@ export default function PricingPage() {
               ))}
             </ul>
 
-            <button
-              className={`w-full py-3 rounded-xl font-bold text-sm transition-colors ${
+            <Link
+              href={plan.slug === 'enterprise' ? '#' : `/signup?plan=${plan.slug}`}
+              className={`w-full py-3 rounded-xl font-bold text-sm transition-colors text-center block ${
                 plan.highlighted
                   ? 'bg-white text-teal-700 hover:bg-teal-50'
                   : 'bg-teal-700 text-white hover:bg-teal-800'
               }`}
             >
               {plan.cta}
-            </button>
+            </Link>
           </div>
         ))}
       </div>
