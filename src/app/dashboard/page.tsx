@@ -1,9 +1,26 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PatientCard from '@/components/PatientCard'
 import type { SessionWithPatient } from '@/lib/types'
+
+function playAlertSound() {
+  const ctx = new AudioContext()
+  const osc = ctx.createOscillator()
+  const gain = ctx.createGain()
+  osc.connect(gain)
+  gain.connect(ctx.destination)
+  osc.frequency.value = 880
+  gain.gain.value = 0.3
+  osc.start()
+  osc.frequency.setValueAtTime(880, ctx.currentTime)
+  osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15)
+  osc.frequency.setValueAtTime(880, ctx.currentTime + 0.3)
+  gain.gain.setValueAtTime(0.3, ctx.currentTime + 0.4)
+  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5)
+  osc.stop(ctx.currentTime + 0.5)
+}
 
 function sortSessions(sessions: SessionWithPatient[]): SessionWithPatient[] {
   return [...sessions].sort((a, b) => {
@@ -17,6 +34,8 @@ function sortSessions(sessions: SessionWithPatient[]): SessionWithPatient[] {
 export default function DashboardPage() {
   const [sessions, setSessions] = useState<SessionWithPatient[]>([])
   const [loading, setLoading] = useState(true)
+  const [alert, setAlert] = useState<string | null>(null)
+  const alertTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -63,9 +82,16 @@ export default function DashboardPage() {
             .eq('id', payload.new.id)
             .single()
           if (data) {
+            const s = data as SessionWithPatient
             setSessions((prev) =>
-              prev.map((s) => (s.id === data.id ? (data as SessionWithPatient) : s))
+              prev.map((p) => (p.id === s.id ? s : p))
             )
+            if (s.urgency && s.urgency <= 2 && s.status === 'waiting') {
+              playAlertSound()
+              setAlert(`URGENT: ${s.patients.name} needs immediate attention`)
+              if (alertTimeoutRef.current) clearTimeout(alertTimeoutRef.current)
+              alertTimeoutRef.current = setTimeout(() => setAlert(null), 8000)
+            }
           }
         }
       )
@@ -120,6 +146,19 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Urgent Alert Banner */}
+      {alert && (
+        <div className="bg-red-600 text-white px-6 py-3 flex items-center justify-between animate-pulse">
+          <div className="flex items-center gap-2 font-bold text-sm">
+            <span className="text-lg">🚨</span>
+            {alert}
+          </div>
+          <button onClick={() => setAlert(null)} className="text-white/80 hover:text-white text-xs font-bold">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="px-6 py-4 grid grid-cols-2 sm:grid-cols-4 gap-3">

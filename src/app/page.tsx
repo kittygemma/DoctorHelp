@@ -23,6 +23,10 @@ export default function Home() {
           I'm a Doctor
         </Link>
       </div>
+
+      <Link href="/pricing" className="mt-8 text-sm text-slate-400 hover:text-teal-700 transition-colors">
+        View Pricing
+      </Link>
     </div>
   )
 }

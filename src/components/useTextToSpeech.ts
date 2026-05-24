@@ -2,9 +2,14 @@
 
 import { useRef, useCallback, useState } from 'react'
 
-export function useTextToSpeech() {
+export function useTextToSpeech(onDone?: () => void) {
   const [speaking, setSpeaking] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+
+  const handleDone = useCallback(() => {
+    setSpeaking(false)
+    onDone?.()
+  }, [onDone])
 
   const stop = useCallback(() => {
     if (audioRef.current) {
@@ -32,12 +37,12 @@ export function useTextToSpeech() {
         const audio = new Audio(url)
         audioRef.current = audio
         audio.onended = () => {
-          setSpeaking(false)
           URL.revokeObjectURL(url)
+          handleDone()
         }
         audio.onerror = () => {
-          setSpeaking(false)
           URL.revokeObjectURL(url)
+          handleDone()
         }
         await audio.play()
         return
@@ -51,13 +56,13 @@ export function useTextToSpeech() {
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.rate = 0.95
       utterance.pitch = 1.0
-      utterance.onend = () => setSpeaking(false)
-      utterance.onerror = () => setSpeaking(false)
+      utterance.onend = () => handleDone()
+      utterance.onerror = () => handleDone()
       window.speechSynthesis.speak(utterance)
     } else {
-      setSpeaking(false)
+      handleDone()
     }
-  }, [stop])
+  }, [stop, handleDone])
 
   return { speak, stop, speaking }
 }

@@ -19,9 +19,10 @@ interface VoiceInputProps {
   onTranscript: (text: string) => void
   disabled?: boolean
   stopRef?: React.MutableRefObject<(() => void) | null>
+  startRef?: React.MutableRefObject<(() => void) | null>
 }
 
-export default function VoiceInput({ onTranscript, disabled, stopRef }: VoiceInputProps) {
+export default function VoiceInput({ onTranscript, disabled, stopRef, startRef }: VoiceInputProps) {
   const [listening, setListening] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
@@ -33,6 +34,7 @@ export default function VoiceInput({ onTranscript, disabled, stopRef }: VoiceInp
   }, [])
 
   if (stopRef) stopRef.current = stop
+  if (startRef) startRef.current = () => { if (!listening && !disabled) toggle() }
 
   const toggle = useCallback(() => {
     if (listening) {

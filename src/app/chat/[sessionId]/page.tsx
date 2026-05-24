@@ -26,7 +26,11 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
   const [patientName, setPatientName] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const voiceStopRef = useRef<(() => void) | null>(null)
-  const { speak, stop: stopSpeaking, speaking } = useTextToSpeech()
+  const voiceStartRef = useRef<(() => void) | null>(null)
+  const { speak, stop: stopSpeaking, speaking } = useTextToSpeech(() => {
+    // Auto-start listening when AI finishes speaking
+    setTimeout(() => voiceStartRef.current?.(), 300)
+  })
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -196,7 +200,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
           disabled={loading}
           className="flex-1 bg-slate-100 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50"
         />
-        <VoiceInput onTranscript={setInput} disabled={loading} stopRef={voiceStopRef} />
+        <VoiceInput onTranscript={setInput} disabled={loading} stopRef={voiceStopRef} startRef={voiceStartRef} />
         {input.trim() && (
           <button
             type="submit"
