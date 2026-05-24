@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
   if (message === '__init__') {
     const { reply, assessment } = await chat(
       patient.name,
+      patient.gender,
       patient.medical_history,
       []
     )
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest) {
   // Call Gemini
   const { reply, assessment } = await chat(
     patient.name,
+    patient.gender,
     patient.medical_history,
     allMessages
   )

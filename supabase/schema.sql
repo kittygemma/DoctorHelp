@@ -3,6 +3,7 @@ create table patients (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   dob date not null,
+  gender text,
   medical_history jsonb default '{}',
   created_at timestamptz default now(),
   unique(name, dob)

@@ -6,7 +6,10 @@ import { useRouter } from 'next/navigation'
 export default function CheckinPage() {
   const router = useRouter()
   const [name, setName] = useState('')
-  const [dob, setDob] = useState('')
+  const [month, setMonth] = useState('')
+  const [day, setDay] = useState('')
+  const [year, setYear] = useState('')
+  const [gender, setGender] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -19,7 +22,11 @@ export default function CheckinPage() {
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, dob }),
+        body: JSON.stringify({
+          name,
+          dob: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`,
+          gender,
+        }),
       })
 
       if (!res.ok) {
@@ -63,13 +70,60 @@ export default function CheckinPage() {
         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
           Date of Birth
         </label>
-        <input
-          type="date"
-          value={dob}
-          onChange={(e) => setDob(e.target.value)}
-          required
-          className="w-full border-2 border-slate-200 rounded-lg px-4 py-3 mb-6 text-sm bg-slate-50 focus:border-teal-500 focus:outline-none"
-        />
+        <div className="flex gap-2 mb-4">
+          <select
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            required
+            className="flex-1 border-2 border-slate-200 rounded-lg px-3 py-3 text-sm bg-slate-50 focus:border-teal-500 focus:outline-none"
+          >
+            <option value="">Month</option>
+            {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m, i) => (
+              <option key={m} value={String(i + 1)}>{m}</option>
+            ))}
+          </select>
+          <select
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+            required
+            className="w-20 border-2 border-slate-200 rounded-lg px-3 py-3 text-sm bg-slate-50 focus:border-teal-500 focus:outline-none"
+          >
+            <option value="">Day</option>
+            {Array.from({ length: 31 }, (_, i) => (
+              <option key={i + 1} value={String(i + 1)}>{i + 1}</option>
+            ))}
+          </select>
+          <input
+            type="number"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            required
+            min="1900"
+            max={new Date().getFullYear()}
+            placeholder="Year"
+            className="w-24 border-2 border-slate-200 rounded-lg px-3 py-3 text-sm bg-slate-50 focus:border-teal-500 focus:outline-none"
+          />
+        </div>
+
+        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">
+          Gender at Birth
+        </label>
+        <div className="flex gap-2 mb-6">
+          {['Male', 'Female'].map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setGender(g.toLowerCase())}
+              className={`flex-1 py-3 rounded-lg text-sm font-semibold transition-colors ${
+                gender === g.toLowerCase()
+                  ? 'bg-teal-700 text-white'
+                  : 'bg-slate-50 border-2 border-slate-200 text-slate-600 hover:border-teal-500'
+              }`}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
 
         <button
           type="submit"

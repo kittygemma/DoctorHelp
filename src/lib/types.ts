@@ -2,6 +2,7 @@ export interface Patient {
   id: string
   name: string
   dob: string
+  gender: string | null
   medical_history: MedicalHistory
   created_at: string
 }

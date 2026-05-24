@@ -3,10 +3,11 @@ import type { Assessment, MedicalHistory, Message } from './types'
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_STUDIO_API_KEY!)
 
-function buildSystemPrompt(patientName: string, history?: MedicalHistory): string {
+function buildSystemPrompt(patientName: string, gender?: string | null, history?: MedicalHistory): string {
+  const genderInfo = gender ? ` (${gender})` : ''
   let prompt = `You are a professional, warm pre-visit health assistant working at a medical clinic. Your role is to gather information about a patient's symptoms before they see the doctor.
 
-The patient's name is ${patientName}.
+The patient's name is ${patientName}${genderInfo}.
 
 ## Your Approach
 - Be empathetic but structured, like a skilled nurse doing intake
@@ -74,12 +75,13 @@ export interface GeminiResponse {
 
 export async function chat(
   patientName: string,
+  gender: string | null | undefined,
   history: MedicalHistory | undefined,
   messages: Message[]
 ): Promise<GeminiResponse> {
   const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
-    systemInstruction: buildSystemPrompt(patientName, history),
+    systemInstruction: buildSystemPrompt(patientName, gender, history),
     generationConfig: {
       responseMimeType: 'application/json',
     },

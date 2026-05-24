@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
-  const { name, dob } = await request.json()
+  const { name, dob, gender } = await request.json()
 
   if (!name || !dob) {
     return NextResponse.json({ error: 'Name and date of birth are required' }, { status: 400 })
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   if (!patient) {
     const { data: newPatient, error } = await supabase
       .from('patients')
-      .insert({ name: name.trim(), dob })
+      .insert({ name: name.trim(), dob, gender })
       .select()
       .single()
 
