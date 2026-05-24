@@ -71,16 +71,16 @@ export default function DashboardPage() {
       const today = new Date()
       today.setHours(0, 0, 0, 0)
 
-      let query = supabase
+      if (!clinicId) {
+        setLoading(false)
+        return
+      }
+
+      const { data } = await supabase
         .from('sessions')
         .select('*, patients(*)')
         .gte('arrived_at', today.toISOString())
-
-      if (clinicId) {
-        query = query.eq('clinic_id', clinicId)
-      }
-
-      const { data } = await query
+        .eq('clinic_id', clinicId)
         .order('arrived_at', { ascending: true })
 
       if (data) {
