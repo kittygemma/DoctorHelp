@@ -18,12 +18,21 @@ interface SpeechRecognitionEventMap {
 interface VoiceInputProps {
   onTranscript: (text: string) => void
   disabled?: boolean
+  stopRef?: React.MutableRefObject<(() => void) | null>
 }
 
-export default function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
+export default function VoiceInput({ onTranscript, disabled, stopRef }: VoiceInputProps) {
   const [listening, setListening] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
+
+  const stop = useCallback(() => {
+    recognitionRef.current?.stop()
+    recognitionRef.current = null
+    setListening(false)
+  }, [])
+
+  if (stopRef) stopRef.current = stop
 
   const toggle = useCallback(() => {
     if (listening) {

@@ -24,6 +24,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
   const [done, setDone] = useState(false)
   const [patientName, setPatientName] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
+  const voiceStopRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -68,6 +69,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
       created_at: new Date().toISOString(),
     }
 
+    voiceStopRef.current?.()
     setMessages((prev) => [...prev, patientMsg])
     setInput('')
     setLoading(true)
@@ -189,7 +191,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
           disabled={loading}
           className="flex-1 bg-slate-100 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50"
         />
-        <VoiceInput onTranscript={setInput} disabled={loading} />
+        <VoiceInput onTranscript={setInput} disabled={loading} stopRef={voiceStopRef} />
         {input.trim() && (
           <button
             type="submit"
