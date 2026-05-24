@@ -51,20 +51,29 @@ export default function VoiceInput({ onTranscript, disabled, stopRef, startRef }
     }
 
     const recognition = new SpeechRecognition()
-    recognition.continuous = false
+    recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = 'en-US'
 
     recognition.onresult = (event: { results: SpeechRecognitionResultList }) => {
-      let transcript = ''
+      let finalTranscript = ''
+      let interimTranscript = ''
       for (let i = 0; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript
+        const result = event.results[i]
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((result as any).isFinal) {
+          finalTranscript += result[0].transcript
+        } else {
+          interimTranscript += result[0].transcript
+        }
       }
-      onTranscript(transcript)
+      onTranscript(finalTranscript || interimTranscript)
     }
 
-    recognition.onerror = () => {
-      setListening(false)
+    recognition.onerror = (event: { error: string }) => {
+      if (event.error !== 'no-speech') {
+        setListening(false)
+      }
     }
 
     recognition.onend = () => {
