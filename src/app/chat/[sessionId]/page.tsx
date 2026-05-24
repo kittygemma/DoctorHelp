@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, use } from 'react'
 import { useRouter } from 'next/navigation'
 import ChatMessage from '@/components/ChatMessage'
 import VoiceInput from '@/components/VoiceInput'
+import { useTextToSpeech } from '@/components/useTextToSpeech'
 import type { Message } from '@/lib/types'
 
 const OPENING_MESSAGE: Message = {
@@ -25,6 +26,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
   const [patientName, setPatientName] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const voiceStopRef = useRef<(() => void) | null>(null)
+  const { speak, stop: stopSpeaking, speaking } = useTextToSpeech()
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -47,6 +49,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
           session_id: sessionId,
           content: data.reply,
         }])
+        speak(data.reply)
       } catch {
         setMessages([{
           ...OPENING_MESSAGE,
@@ -70,6 +73,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
     }
 
     voiceStopRef.current?.()
+    stopSpeaking()
     setMessages((prev) => [...prev, patientMsg])
     setInput('')
     setLoading(true)
@@ -92,6 +96,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
       }
 
       setMessages((prev) => [...prev, aiMsg])
+      speak(data.reply)
 
       if (data.assessment?.ready_to_wrap) {
         setReadyToWrap(true)
@@ -148,7 +153,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
           <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-lg">🩺</div>
           <div>
             <div className="font-bold text-sm">DoctorHelp</div>
-            <div className="text-[10px] opacity-75">Session active</div>
+            <div className="text-[10px] opacity-75">{speaking ? 'Speaking...' : 'Session active'}</div>
           </div>
         </div>
         <button
