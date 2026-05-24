@@ -63,6 +63,7 @@ export default async function SessionDetailPage({
             <div className="space-y-2 text-sm">
               <div><span className="text-slate-500">Name:</span> <span className="font-semibold">{patient.name}</span></div>
               <div><span className="text-slate-500">DOB:</span> <span className="font-semibold">{patient.dob}</span></div>
+              {patient.gender && <div><span className="text-slate-500">Gender:</span> <span className="font-semibold capitalize">{patient.gender}</span></div>}
               <div><span className="text-slate-500">Arrived:</span> <span className="font-semibold">{new Date(session.arrived_at).toLocaleTimeString()}</span></div>
               <div><span className="text-slate-500">Status:</span> <span className="font-semibold capitalize">{session.status}</span></div>
             </div>
