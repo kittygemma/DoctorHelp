@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI, type Content } from '@google/generative-ai'
 import type { Assessment, MedicalHistory, Message } from './types'
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_STUDIO_API_KEY!)
+function getGenAI() {
+  return new GoogleGenerativeAI(process.env.GOOGLE_AI_STUDIO_API_KEY!)
+}
 
 function buildSystemPrompt(patientName: string, gender?: string | null, history?: MedicalHistory): string {
   const genderInfo = gender ? ` (${gender})` : ''
@@ -79,7 +81,7 @@ export async function chat(
   history: MedicalHistory | undefined,
   messages: Message[]
 ): Promise<GeminiResponse> {
-  const model = genAI.getGenerativeModel({
+  const model = getGenAI().getGenerativeModel({
     model: 'gemini-2.5-flash',
     systemInstruction: buildSystemPrompt(patientName, gender, history),
     generationConfig: {

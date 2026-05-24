@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
 
 function generateCode(): string {
   return Math.random().toString(36).substring(2, 8)
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/pricing', request.url))
   }
 
-  const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId)
+  const checkoutSession = await getStripe().checkout.sessions.retrieve(sessionId)
 
   if (checkoutSession.payment_status !== 'paid') {
     return NextResponse.redirect(new URL('/pricing', request.url))

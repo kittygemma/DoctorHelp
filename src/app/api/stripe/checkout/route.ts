@@ -1,24 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
 
-const PRICE_MAP: Record<string, string> = {
-  starter: process.env.STRIPE_STARTER_PRICE_ID!,
-  professional: process.env.STRIPE_PRO_PRICE_ID!,
+function getPriceMap(): Record<string, string> {
+  return {
+    starter: process.env.STRIPE_STARTER_PRICE_ID!,
+    professional: process.env.STRIPE_PRO_PRICE_ID!,
+  }
 }
 
 export async function POST(request: NextRequest) {
   const { plan, doctorName, email, userId } = await request.json()
 
-  const priceId = PRICE_MAP[plan]
+  const priceId = getPriceMap()[plan]
   if (!priceId) {
     return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
   }
 
   const origin = request.headers.get('origin') || 'http://localhost:3000'
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
     customer_email: email,
