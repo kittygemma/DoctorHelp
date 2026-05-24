@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { chat } from '@/lib/claude'
+import { chat } from '@/lib/gemini'
 import type { Message, Patient } from '@/lib/types'
 
 export async function POST(request: NextRequest) {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   const patient = session.patients as Patient
 
-  // Handle init — just get the opening message from Claude
+  // Handle init — just get the opening message from Gemini
   if (message === '__init__') {
     const { reply, assessment } = await chat(
       patient.name,
@@ -67,14 +67,14 @@ export async function POST(request: NextRequest) {
 
   const allMessages = existingMessages as Message[]
 
-  // Call Claude
+  // Call Gemini
   const { reply, assessment } = await chat(
     patient.name,
     patient.medical_history,
     allMessages
   )
 
-  // Save Claude's response
+  // Save Gemini's response
   await supabase.from('messages').insert({
     session_id: sessionId,
     role: 'assistant',

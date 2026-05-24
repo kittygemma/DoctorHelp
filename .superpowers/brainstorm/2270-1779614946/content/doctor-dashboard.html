@@ -1,0 +1,167 @@
+<h2>Doctor Dashboard — Live Triage View</h2>
+<p class="subtitle">What the doctor sees on their computer or tablet. Patients sorted by urgency then arrival time.</p>
+
+<div class="mockup">
+  <div class="mockup-header">Doctor Dashboard — Desktop View</div>
+  <div class="mockup-body" style="background: #f1f5f9; padding: 0;">
+
+    <!-- Top nav -->
+    <div style="background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="font-size: 20px;">🩺</div>
+        <div style="font-weight: 800; font-size: 17px; color: #0f172a; letter-spacing: 0.2px;">DoctorHelp</div>
+        <div style="background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">Dashboard</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 12px; color: #64748b;">Dr. Martinez</div>
+        <div style="width: 32px; height: 32px; background: #0f766e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: 700;">DM</div>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <div style="padding: 16px 24px; display: flex; gap: 12px;">
+      <div style="background: white; border-radius: 10px; padding: 14px 18px; flex: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+        <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Waiting</div>
+        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-top: 2px;">4</div>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 14px 18px; flex: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+        <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">In Progress</div>
+        <div style="font-size: 28px; font-weight: 800; color: #f59e0b; margin-top: 2px;">2</div>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 14px 18px; flex: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+        <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Completed</div>
+        <div style="font-size: 28px; font-weight: 800; color: #10b981; margin-top: 2px;">7</div>
+      </div>
+      <div style="background: white; border-radius: 10px; padding: 14px 18px; flex: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+        <div style="font-size: 10px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Avg Wait</div>
+        <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-top: 2px;">12m</div>
+      </div>
+    </div>
+
+    <!-- Patient list -->
+    <div style="padding: 0 24px 20px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Waiting Patients</div>
+        <div style="font-size: 11px; color: #64748b; display: flex; align-items: center; gap: 4px;">
+          <div style="width: 6px; height: 6px; background: #10b981; border-radius: 50; animation: pulse 2s infinite;"></div>
+          Live — sorted by urgency + arrival
+        </div>
+      </div>
+
+      <!-- Patient 1: CRITICAL -->
+      <div style="background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 8px; border-left: 4px solid #dc2626; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: flex-start; gap: 14px;">
+        <div style="text-align: center; flex-shrink: 0;">
+          <div style="background: #dc2626; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">1</div>
+          <div style="font-size: 9px; color: #dc2626; font-weight: 700; margin-top: 3px;">CRITICAL</div>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Robert Chen</div>
+            <div style="font-size: 11px; color: #94a3b8;">Arrived 9:12 AM (31 min ago)</div>
+          </div>
+          <div style="font-size: 12px; color: #475569; margin-top: 6px; line-height: 1.6;">
+            <strong>Summary:</strong> 62M, severe chest pain radiating to left arm, shortness of breath, diaphoresis. History of hypertension and high cholesterol. Symptoms started 45 min ago.
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+            <span style="background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Possible MI</span>
+            <span style="background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Angina</span>
+            <span style="background: #f1f5f9; color: #475569; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Returning patient</span>
+          </div>
+        </div>
+        <div style="flex-shrink: 0;">
+          <div style="background: #0f766e; color: white; padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">View Full</div>
+        </div>
+      </div>
+
+      <!-- Patient 2: URGENT -->
+      <div style="background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 8px; border-left: 4px solid #f97316; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: flex-start; gap: 14px;">
+        <div style="text-align: center; flex-shrink: 0;">
+          <div style="background: #f97316; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">2</div>
+          <div style="font-size: 9px; color: #f97316; font-weight: 700; margin-top: 3px;">URGENT</div>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Maria Santos</div>
+            <div style="font-size: 11px; color: #94a3b8;">Arrived 9:20 AM (23 min ago)</div>
+          </div>
+          <div style="font-size: 12px; color: #475569; margin-top: 6px; line-height: 1.6;">
+            <strong>Summary:</strong> 34F, severe abdominal pain (8/10), lower right quadrant, nausea, low-grade fever (100.4F). No prior surgeries. Pain worsening over 12 hours.
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+            <span style="background: #fff7ed; color: #ea580c; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Possible Appendicitis</span>
+            <span style="background: #fff7ed; color: #ea580c; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Ovarian Cyst</span>
+            <span style="background: #f1f5f9; color: #475569; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">New patient</span>
+          </div>
+        </div>
+        <div style="flex-shrink: 0;">
+          <div style="background: #0f766e; color: white; padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">View Full</div>
+        </div>
+      </div>
+
+      <!-- Patient 3: MODERATE -->
+      <div style="background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 8px; border-left: 4px solid #eab308; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: flex-start; gap: 14px;">
+        <div style="text-align: center; flex-shrink: 0;">
+          <div style="background: #eab308; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">3</div>
+          <div style="font-size: 9px; color: #eab308; font-weight: 700; margin-top: 3px;">MODERATE</div>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Jane Doe</div>
+            <div style="font-size: 11px; color: #94a3b8;">Arrived 9:05 AM (38 min ago)</div>
+          </div>
+          <div style="font-size: 12px; color: #475569; margin-top: 6px; line-height: 1.6;">
+            <strong>Summary:</strong> 39F, recurring headaches (7/10) behind eyes for 1 week, worse in mornings, light sensitivity. History of migraines. OTC pain meds not helping.
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+            <span style="background: #fefce8; color: #a16207; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Migraine</span>
+            <span style="background: #fefce8; color: #a16207; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Tension Headache</span>
+            <span style="background: #fefce8; color: #a16207; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Sinusitis</span>
+            <span style="background: #f1f5f9; color: #475569; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Returning patient</span>
+          </div>
+        </div>
+        <div style="flex-shrink: 0;">
+          <div style="background: #0f766e; color: white; padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">View Full</div>
+        </div>
+      </div>
+
+      <!-- Patient 4: LOW (still chatting) -->
+      <div style="background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 8px; border-left: 4px solid #22c55e; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: flex-start; gap: 14px;">
+        <div style="text-align: center; flex-shrink: 0;">
+          <div style="background: #22c55e; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">4</div>
+          <div style="font-size: 9px; color: #22c55e; font-weight: 700; margin-top: 3px;">LOW</div>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Tom Williams</div>
+            <div style="font-size: 11px; color: #94a3b8;">Arrived 9:35 AM (8 min ago)</div>
+          </div>
+          <div style="font-size: 12px; color: #475569; margin-top: 6px; line-height: 1.6;">
+            <strong>Summary:</strong> 28M, mild sore throat for 2 days, no fever, no difficulty swallowing. Requesting routine check-up as well.
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+            <span style="background: #f0fdf4; color: #16a34a; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Pharyngitis</span>
+            <span style="background: #f0fdf4; color: #16a34a; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px;">Common Cold</span>
+            <span style="background: #dbeafe; color: #2563eb; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 4px; display: flex; align-items: center; gap: 3px;">
+              <span style="width: 5px; height: 5px; background: #2563eb; border-radius: 50%;"></span>Still chatting
+            </span>
+          </div>
+        </div>
+        <div style="flex-shrink: 0;">
+          <div style="background: #e2e8f0; color: #64748b; padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: 700;">Pending</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 20px; padding: 16px 20px; background: rgba(15, 118, 110, 0.06); border-radius: 10px; border-left: 3px solid #0f766e;">
+  <h3 style="margin: 0 0 6px 0; font-size: 13px; color: #0f766e;">Dashboard Features</h3>
+  <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #475569; line-height: 1.8;">
+    <li>Sorted by urgency (1=critical first) then by arrival time</li>
+    <li>Color-coded urgency: red (1), orange (2), yellow (3), green (4), blue (5)</li>
+    <li>Live updates via Supabase Realtime — no refresh needed</li>
+    <li>"Still chatting" badge for patients mid-conversation</li>
+    <li>"View Full" opens the complete chat transcript + AI analysis</li>
+    <li>Stats bar shows waiting count, in-progress, completed, avg wait time</li>
+  </ul>
+</div>
