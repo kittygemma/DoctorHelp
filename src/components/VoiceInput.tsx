@@ -2,6 +2,19 @@
 
 import { useState, useRef, useCallback } from 'react'
 
+interface SpeechRecognitionResult {
+  readonly 0: { transcript: string }
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number
+  [index: number]: SpeechRecognitionResult
+}
+
+interface SpeechRecognitionEventMap {
+  results: SpeechRecognitionResultList
+}
+
 interface VoiceInputProps {
   onTranscript: (text: string) => void
   disabled?: boolean
@@ -9,7 +22,8 @@ interface VoiceInputProps {
 
 export default function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
   const [listening, setListening] = useState(false)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null)
 
   const toggle = useCallback(() => {
     if (listening) {
@@ -18,7 +32,8 @@ export default function VoiceInput({ onTranscript, disabled }: VoiceInputProps) 
       return
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRecognition) {
       alert('Speech recognition is not supported in this browser. Please use Chrome.')
       return
@@ -29,10 +44,11 @@ export default function VoiceInput({ onTranscript, disabled }: VoiceInputProps) 
     recognition.interimResults = true
     recognition.lang = 'en-US'
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const transcript = Array.from(event.results)
-        .map((result) => result[0].transcript)
-        .join('')
+    recognition.onresult = (event: { results: SpeechRecognitionResultList }) => {
+      let transcript = ''
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript
+      }
       onTranscript(transcript)
     }
 
