@@ -98,7 +98,7 @@ export default function CheckinPage() {
             value={year}
             onChange={(e) => setYear(e.target.value)}
             required
-            min="1900"
+            min={new Date().getFullYear() - 120}
             max={new Date().getFullYear()}
             placeholder="Year"
             className="w-24 border-2 border-slate-200 rounded-lg px-3 py-3 text-sm bg-slate-50 focus:border-teal-500 focus:outline-none"
