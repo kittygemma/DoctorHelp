@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import PatientCard from '@/components/PatientCard'
 import type { SessionWithPatient } from '@/lib/types'
@@ -71,9 +71,26 @@ export default function DashboardPage() {
       )
       .subscribe()
 
+    // Auto-expire: every 60 seconds, dismiss sessions active for 30+ minutes
+    const expireInterval = setInterval(async () => {
+      const now = Date.now()
+      const expired = sessions.filter(
+        (s) => s.status === 'active' && now - new Date(s.arrived_at).getTime() > 30 * 60 * 1000
+      )
+      for (const s of expired) {
+        await fetch(`/api/sessions/${s.id}/dismiss`, { method: 'POST' })
+        setSessions((prev) => prev.filter((p) => p.id !== s.id))
+      }
+    }, 60000)
+
     return () => {
       supabase.removeChannel(channel)
+      clearInterval(expireInterval)
     }
+  }, [sessions])
+
+  const handleDismiss = useCallback((id: string) => {
+    setSessions((prev) => prev.filter((s) => s.id !== id))
   }, [])
 
   const inProgressSessions = sessions.filter((s) => s.status === 'active')
@@ -143,7 +160,7 @@ export default function DashboardPage() {
             ) : (
               <div className="space-y-2">
                 {waitingSessions.map((session) => (
-                  <PatientCard key={session.id} session={session} />
+                  <PatientCard key={session.id} session={session} onDismiss={handleDismiss} />
                 ))}
               </div>
             )}
@@ -154,7 +171,7 @@ export default function DashboardPage() {
                 <h2 className="font-bold text-sm text-slate-900 mt-8 mb-3">Chatting with AI</h2>
                 <div className="space-y-2">
                   {inProgressSessions.map((session) => (
-                    <PatientCard key={session.id} session={session} />
+                    <PatientCard key={session.id} session={session} onDismiss={handleDismiss} />
                   ))}
                 </div>
               </>
@@ -166,7 +183,7 @@ export default function DashboardPage() {
                 <h2 className="font-bold text-sm text-slate-900 mt-8 mb-3">Completed</h2>
                 <div className="space-y-2">
                   {completedSessions.map((session) => (
-                    <PatientCard key={session.id} session={session} />
+                    <PatientCard key={session.id} session={session} onDismiss={handleDismiss} />
                   ))}
                 </div>
               </>

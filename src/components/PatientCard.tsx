@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import type { SessionWithPatient } from '@/lib/types'
 
@@ -25,10 +28,17 @@ function formatTime(dateStr: string): string {
   })
 }
 
-export default function PatientCard({ session }: { session: SessionWithPatient }) {
+export default function PatientCard({ session, onDismiss }: { session: SessionWithPatient; onDismiss?: (id: string) => void }) {
+  const [dismissing, setDismissing] = useState(false)
   const urgency = session.urgency ?? 5
   const config = URGENCY_CONFIG[urgency] ?? URGENCY_CONFIG[5]
   const patient = session.patients
+
+  async function handleDismiss() {
+    setDismissing(true)
+    await fetch(`/api/sessions/${session.id}/dismiss`, { method: 'POST' })
+    onDismiss?.(session.id)
+  }
 
   return (
     <div className={`bg-white rounded-xl p-4 border-l-4 ${config.border} shadow-sm flex items-start gap-3`}>
@@ -77,18 +87,29 @@ export default function PatientCard({ session }: { session: SessionWithPatient }
         </div>
       </div>
 
-      <Link
-        href={`/dashboard/${session.id}`}
-        className={`flex-shrink-0 px-3 py-2 rounded-lg text-xs font-bold ${
-          session.status === 'waiting'
-            ? 'bg-teal-700 text-white hover:bg-teal-800'
-            : session.status === 'completed'
-            ? 'bg-slate-200 text-slate-600 hover:bg-slate-300'
-            : 'bg-slate-100 text-slate-400'
-        }`}
-      >
-        {session.status === 'active' ? 'Chatting...' : 'View'}
-      </Link>
+      <div className="flex flex-col gap-1.5 flex-shrink-0">
+        <Link
+          href={`/dashboard/${session.id}`}
+          className={`px-3 py-2 rounded-lg text-xs font-bold text-center ${
+            session.status === 'waiting'
+              ? 'bg-teal-700 text-white hover:bg-teal-800'
+              : session.status === 'completed'
+              ? 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+              : 'bg-slate-100 text-slate-400'
+          }`}
+        >
+          {session.status === 'active' ? 'Chatting...' : 'View'}
+        </Link>
+        {session.status !== 'completed' && (
+          <button
+            onClick={handleDismiss}
+            disabled={dismissing}
+            className="px-3 py-1.5 rounded-lg text-[10px] font-semibold text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+          >
+            Dismiss
+          </button>
+        )}
+      </div>
     </div>
   )
 }
