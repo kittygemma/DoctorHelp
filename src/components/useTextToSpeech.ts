@@ -15,28 +15,31 @@ function speakWithBrowser(text: string, onDone?: () => void) {
   window.speechSynthesis.speak(utterance)
 }
 
+let audioCtx: AudioContext | null = null
+
+function getAudioContext(): AudioContext {
+  if (!audioCtx) {
+    audioCtx = new AudioContext()
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume()
+  }
+  return audioCtx
+}
+
 export function useTextToSpeech(onDone?: () => void) {
   const [speaking, setSpeaking] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const blobUrlRef = useRef<string | null>(null)
-
-  const cleanup = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.removeAttribute('src')
-      audioRef.current = null
-    }
-    if (blobUrlRef.current) {
-      URL.revokeObjectURL(blobUrlRef.current)
-      blobUrlRef.current = null
-    }
-  }, [])
+  const sourceRef = useRef<AudioBufferSourceNode | null>(null)
 
   const stop = useCallback(() => {
-    cleanup()
+    if (sourceRef.current) {
+      try { sourceRef.current.stop() } catch {}
+      sourceRef.current.disconnect()
+      sourceRef.current = null
+    }
     window.speechSynthesis?.cancel()
     setSpeaking(false)
-  }, [cleanup])
+  }, [])
 
   const speak = useCallback(async (text: string) => {
     stop()
@@ -51,35 +54,31 @@ export function useTextToSpeech(onDone?: () => void) {
 
       if (!res.ok) throw new Error(`TTS API returned ${res.status}`)
 
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      blobUrlRef.current = url
+      const arrayBuffer = await res.arrayBuffer()
+      const ctx = getAudioContext()
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
 
-      const audio = new Audio(url)
-      audioRef.current = audio
+      const source = ctx.createBufferSource()
+      source.buffer = audioBuffer
+      source.connect(ctx.destination)
+      sourceRef.current = source
 
-      audio.onended = () => {
-        cleanup()
+      source.onended = () => {
+        sourceRef.current = null
         setSpeaking(false)
         onDone?.()
       }
 
-      audio.onerror = () => {
-        cleanup()
-        setSpeaking(false)
-        onDone?.()
-      }
-
-      await audio.play()
+      source.start()
     } catch (err) {
       console.error('ElevenLabs TTS failed, falling back to browser:', err)
-      cleanup()
+      sourceRef.current = null
       speakWithBrowser(text, () => {
         setSpeaking(false)
         onDone?.()
       })
     }
-  }, [stop, cleanup, onDone])
+  }, [stop, onDone])
 
   return { speak, stop, speaking }
 }
