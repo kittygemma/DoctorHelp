@@ -49,7 +49,7 @@ export default function ClinicCheckinPage({ params }: { params: Promise<{ clinic
     <div className="min-h-screen bg-green-50 flex items-center justify-center p-6">
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-sm">
         <div className="text-center mb-6">
-          <Image src="/logo.png" alt="DoctorHelp" width={64} height={64} className="mx-auto mb-1 rounded-xl" />
+          <Image src="/logo-icon.png" alt="DoctorHelp" width={80} height={80} className="mx-auto mb-1 rounded-xl" />
           <h1 className="text-xl font-bold text-teal-700">Welcome</h1>
           <p className="text-sm text-slate-500 mt-1">Let's get you checked in</p>
         </div>

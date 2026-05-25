@@ -175,7 +175,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
       {/* Header */}
       <div className="bg-teal-700 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="DoctorHelp" width={32} height={32} className="rounded-full" />
+          <Image src="/logo-icon.png" alt="DoctorHelp" width={36} height={36} className="rounded-full" />
           <div>
             <div className="font-bold text-sm">DoctorHelp</div>
             <div className="text-[10px] opacity-75">{speaking ? 'Speaking...' : 'Session active'}</div>

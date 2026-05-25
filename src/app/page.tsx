@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6">
       <div className="text-center mb-12">
-        <Image src="/logo.png" alt="DoctorHelp" width={120} height={120} className="mx-auto mb-4 rounded-2xl" />
+        <Image src="/logo-icon.png" alt="DoctorHelp" width={160} height={160} className="mx-auto mb-4 rounded-2xl" />
         <h1 className="text-4xl font-bold text-slate-900 mb-2">DoctorHelp</h1>
         <p className="text-lg text-slate-500 max-w-md mx-auto">
           AI-powered pre-visit triage. Reduce wait times and give your doctors a head start.
