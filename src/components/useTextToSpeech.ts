@@ -17,14 +17,29 @@ function speakWithBrowser(text: string, onDone?: () => void) {
 
 let audioCtx: AudioContext | null = null
 
-function getAudioContext(): AudioContext {
+function getOrCreateAudioContext(): AudioContext {
   if (!audioCtx) {
     audioCtx = new AudioContext()
   }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume()
-  }
   return audioCtx
+}
+
+if (typeof window !== 'undefined') {
+  const unlock = () => {
+    const ctx = getOrCreateAudioContext()
+    if (ctx.state === 'suspended') {
+      ctx.resume()
+    }
+    const buf = ctx.createBuffer(1, 1, 22050)
+    const src = ctx.createBufferSource()
+    src.buffer = buf
+    src.connect(ctx.destination)
+    src.start()
+    document.removeEventListener('click', unlock, true)
+    document.removeEventListener('touchstart', unlock, true)
+  }
+  document.addEventListener('click', unlock, true)
+  document.addEventListener('touchstart', unlock, true)
 }
 
 export function useTextToSpeech(onDone?: () => void) {
@@ -46,6 +61,11 @@ export function useTextToSpeech(onDone?: () => void) {
     setSpeaking(true)
 
     try {
+      const ctx = getOrCreateAudioContext()
+      if (ctx.state === 'suspended') {
+        await ctx.resume()
+      }
+
       const res = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,7 +75,6 @@ export function useTextToSpeech(onDone?: () => void) {
       if (!res.ok) throw new Error(`TTS API returned ${res.status}`)
 
       const arrayBuffer = await res.arrayBuffer()
-      const ctx = getAudioContext()
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
 
       const source = ctx.createBufferSource()
