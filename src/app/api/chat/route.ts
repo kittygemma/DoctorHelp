@@ -95,6 +95,9 @@ export async function POST(request: NextRequest) {
     if (assessment.possible_diagnoses?.length > 0) {
       updateData.diagnosis = assessment.possible_diagnoses
     }
+    if (assessment.critical) {
+      updateData.status = 'waiting'
+    }
     await supabase.from('sessions').update(updateData).eq('id', sessionId)
   }
 

@@ -22,6 +22,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [readyToWrap, setReadyToWrap] = useState(false)
+  const [critical, setCritical] = useState(false)
   const [done, setDone] = useState(false)
   const [patientName, setPatientName] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -102,7 +103,10 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
       setMessages((prev) => [...prev, aiMsg])
       speak(data.reply)
 
-      if (data.assessment?.ready_to_wrap) {
+      if (data.assessment?.critical) {
+        voiceStopRef.current?.()
+        setCritical(true)
+      } else if (data.assessment?.ready_to_wrap) {
         setReadyToWrap(true)
       }
     } catch {
@@ -134,6 +138,22 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     sendMessage(input)
+  }
+
+  if (critical) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-red-50">
+        <div className="text-center max-w-sm">
+          <div className="text-6xl mb-4 animate-pulse">🚨</div>
+          <h1 className="text-2xl font-bold text-red-700 mb-3">Please Go to the Front Desk</h1>
+          <p className="text-red-600 text-lg mb-4">Your symptoms need immediate attention from our staff.</p>
+          <div className="bg-red-100 border-2 border-red-300 rounded-xl p-4">
+            <p className="text-red-800 font-semibold">Walk to the front desk now and let them know you need urgent help.</p>
+          </div>
+          <p className="text-red-400 text-sm mt-4">Your doctor has been notified.</p>
+        </div>
+      </div>
+    )
   }
 
   if (done) {
@@ -170,6 +190,12 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
         >
           Done
         </button>
+      </div>
+
+      {/* Info banner */}
+      <div className="bg-teal-50 border-b border-teal-100 px-4 py-2.5 text-xs text-teal-700 flex items-start gap-2">
+        <span className="mt-0.5">ℹ️</span>
+        <span>When you feel you&apos;ve shared all the information your doctor needs, press the <strong>Done</strong> button in the top right corner.</span>
       </div>
 
       {/* Messages */}

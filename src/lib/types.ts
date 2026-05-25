@@ -65,6 +65,7 @@ export interface Assessment {
   possible_diagnoses: Diagnosis[]
   follow_up_questions: string[]
   ready_to_wrap: boolean
+  critical: boolean
 }
 
 export interface SessionWithPatient extends Session {
