@@ -9,6 +9,10 @@ export async function POST(request: Request) {
     return Response.json({ error: 'text is required' }, { status: 400 })
   }
 
+  if (text.length > 5000) {
+    return Response.json({ error: 'text too long' }, { status: 400 })
+  }
+
   const apiKey = process.env.ELEVENLABS_API_KEY
   if (!apiKey) {
     return Response.json({ error: 'ELEVENLABS_API_KEY not configured' }, { status: 500 })
