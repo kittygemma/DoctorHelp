@@ -1,6 +1,19 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
+
+interface SpeechRecognitionResult {
+  readonly 0: { transcript: string }
+}
+
+interface SpeechRecognitionResultList {
+  readonly length: number
+  [index: number]: SpeechRecognitionResult
+}
+
+interface SpeechRecognitionEventMap {
+  results: SpeechRecognitionResultList
+}
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void
@@ -10,99 +23,95 @@ interface VoiceInputProps {
 }
 
 export default function VoiceInput({ onTranscript, disabled, stopRef, startRef }: VoiceInputProps) {
-  const [recording, setRecording] = useState(false)
-  const [transcribing, setTranscribing] = useState(false)
-  const recorderRef = useRef<MediaRecorder | null>(null)
-  const chunksRef = useRef<Blob[]>([])
+  const [listening, setListening] = useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null)
 
-  useEffect(() => {
-    return () => {
-      if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-        recorderRef.current.stop()
-      }
-    }
+  const stop = useCallback(() => {
+    recognitionRef.current?.stop()
+    recognitionRef.current = null
+    setListening(false)
   }, [])
 
-  const stopRecording = useCallback(() => {
-    if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-      recorderRef.current.stop()
+  if (stopRef) stopRef.current = stop
+  if (startRef) startRef.current = () => { if (!listening && !disabled) toggle() }
+
+  const toggle = useCallback(() => {
+    if (listening) {
+      recognitionRef.current?.stop()
+      setListening(false)
+      return
     }
-  }, [])
 
-  const startRecording = useCallback(async () => {
-    if (disabled || recording || transcribing) return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser. Please use Chrome.')
+      return
+    }
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : ''
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined)
-      chunksRef.current = []
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = 'en-US'
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data)
-      }
-
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop())
-        setRecording(false)
-
-        const blob = new Blob(chunksRef.current, { type: recorderRef.current?.mimeType })
-        if (blob.size === 0) return
-
-        setTranscribing(true)
-        try {
-          const form = new FormData()
-          form.append('audio', blob)
-          const res = await fetch('/api/transcribe', { method: 'POST', body: form })
-          if (res.ok) {
-            const { text } = await res.json()
-            if (text?.trim()) onTranscript(text.trim())
-          }
-        } finally {
-          setTranscribing(false)
+    recognition.onresult = (event: { results: SpeechRecognitionResultList }) => {
+      let finalTranscript = ''
+      let interimTranscript = ''
+      for (let i = 0; i < event.results.length; i++) {
+        const result = event.results[i]
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((result as any).isFinal) {
+          finalTranscript += result[0].transcript
+        } else {
+          interimTranscript += result[0].transcript
         }
       }
-
-      recorderRef.current = recorder
-      recorder.start()
-      setRecording(true)
-    } catch {
-      alert('Microphone access is required for voice input.')
+      onTranscript(finalTranscript || interimTranscript)
     }
-  }, [disabled, recording, transcribing, onTranscript])
 
-  if (stopRef) stopRef.current = stopRecording
-  if (startRef) startRef.current = () => { if (!recording && !disabled) startRecording() }
+    recognition.onerror = (event: { error: string }) => {
+      if (event.error !== 'no-speech') {
+        setListening(false)
+      }
+    }
+
+    recognition.onend = () => {
+      setListening(false)
+    }
+
+    recognitionRef.current = recognition
+    recognition.start()
+    setListening(true)
+  }, [listening, onTranscript])
 
   return (
     <button
       type="button"
-      onPointerDown={startRecording}
-      onPointerUp={stopRecording}
-      onPointerLeave={stopRecording}
-      disabled={disabled || transcribing}
+      onClick={toggle}
+      disabled={disabled}
       className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-        recording
+        listening
           ? 'bg-red-500 animate-pulse'
-          : transcribing
-            ? 'bg-teal-500 animate-pulse'
-            : 'bg-teal-700 hover:bg-teal-800'
+          : 'bg-teal-700 hover:bg-teal-800'
       } disabled:opacity-50`}
-      title={recording ? 'Release to send' : transcribing ? 'Transcribing...' : 'Hold to speak'}
+      title={listening ? 'Stop recording' : 'Start recording'}
     >
-      {transcribing ? (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 6v6l4 2" />
-        </svg>
-      ) : (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-          <line x1="12" y1="19" x2="12" y2="23" />
-          <line x1="8" y1="23" x2="16" y2="23" />
-        </svg>
-      )}
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="white"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+        <line x1="12" y1="19" x2="12" y2="23" />
+        <line x1="8" y1="23" x2="16" y2="23" />
+      </svg>
     </button>
   )
 }
