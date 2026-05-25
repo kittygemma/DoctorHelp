@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import PatientCard from '@/components/PatientCard'
 import type { SessionWithPatient } from '@/lib/types'
@@ -170,7 +171,7 @@ export default function DashboardPage() {
       {/* Nav */}
       <div className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🩺</span>
+          <Image src="/logo.png" alt="DoctorHelp" width={28} height={28} className="rounded" />
           <span className="font-extrabold text-base text-slate-900">DoctorHelp</span>
           <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">
             Dashboard

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -48,7 +49,7 @@ export default function ClinicCheckinPage({ params }: { params: Promise<{ clinic
     <div className="min-h-screen bg-green-50 flex items-center justify-center p-6">
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-sm">
         <div className="text-center mb-6">
-          <div className="text-3xl mb-2">👋</div>
+          <Image src="/logo.png" alt="DoctorHelp" width={64} height={64} className="mx-auto mb-1 rounded-xl" />
           <h1 className="text-xl font-bold text-teal-700">Welcome</h1>
           <p className="text-sm text-slate-500 mt-1">Let's get you checked in</p>
         </div>

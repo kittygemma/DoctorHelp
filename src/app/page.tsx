@@ -1,10 +1,11 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6">
       <div className="text-center mb-12">
-        <div className="text-5xl mb-4">🩺</div>
+        <Image src="/logo.png" alt="DoctorHelp" width={120} height={120} className="mx-auto mb-4 rounded-2xl" />
         <h1 className="text-4xl font-bold text-slate-900 mb-2">DoctorHelp</h1>
         <p className="text-lg text-slate-500 max-w-md mx-auto">
           AI-powered pre-visit triage. Reduce wait times and give your doctors a head start.

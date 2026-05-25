@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, use } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import ChatMessage from '@/components/ChatMessage'
 import VoiceInput from '@/components/VoiceInput'
 import { useTextToSpeech } from '@/components/useTextToSpeech'
@@ -174,7 +175,7 @@ export default function ChatPage({ params }: { params: Promise<{ sessionId: stri
       {/* Header */}
       <div className="bg-teal-700 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-lg">🩺</div>
+          <Image src="/logo.png" alt="DoctorHelp" width={32} height={32} className="rounded-full" />
           <div>
             <div className="font-bold text-sm">DoctorHelp</div>
             <div className="text-[10px] opacity-75">{speaking ? 'Speaking...' : 'Session active'}</div>
